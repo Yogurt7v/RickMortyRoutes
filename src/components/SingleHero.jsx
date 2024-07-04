@@ -19,7 +19,7 @@ export function SingleHero() {
       <p>Created: {person[0].created}</p>
 
       <div className="button__wrapper">
-        <button onClick={() => navigate(-1)}>Back</button>
+        <button onClick={() => navigate("/categories/heroes")}>Back</button>
       </div>
     </div>
   );

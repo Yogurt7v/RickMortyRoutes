@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "./App.css";
 import {
   NavMenu,
   Home,
@@ -12,6 +11,7 @@ import {
   SingleHero,
   SingleLocation,
 } from "./components";
+import "./App.css";
 
 function App() {
   return (
@@ -26,12 +26,12 @@ function App() {
               <Route path=":id" element={<SingleHero />} />
             </Route>
             <Route path="episodes"  >
-            <Route index element={<Episodes />} />
-            <Route path=":id" element={<SingleEpisode />} />
+              <Route index element={<Episodes />} />
+              <Route path=":id" element={<SingleEpisode />} />
             </Route>
             <Route path="locations"  >
-            <Route index element={<Locations />} />
-            <Route path=":id" element={<SingleLocation />} />
+              <Route index element={<Locations />} />
+              <Route path=":id" element={<SingleLocation />} />
             </Route>
           </Route>
         </Route>

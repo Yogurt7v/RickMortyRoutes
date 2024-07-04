@@ -15,7 +15,7 @@ export function SingleEpisode() {
       <p>Episode: {scene[0].episode}</p>
       <p>Created: {scene[0].created}</p>
       <div className="button__wrapper">
-        <button onClick={() => navigate(-1)}>Back</button>
+        <button onClick={() => navigate("/categories/episodes")}>Back</button>
       </div>
     </div>
   );

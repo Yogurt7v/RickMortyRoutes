@@ -16,7 +16,7 @@ export function SingleLocation() {
       <p>Created: {local[0].created}</p>
 
       <div className="button__wrapper">
-        <button onClick={() => navigate(-1)}>Back</button>
+        <button onClick={() => navigate("/categories/locations")}>Back</button>
       </div>
     </div>
   );
