@@ -13,7 +13,9 @@ import {
 } from "./components";
 import "./App.css";
 
+
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>
@@ -22,7 +24,7 @@ function App() {
           <Route path="/categories">
             <Route index element={<Categories />} />
             <Route path="heroes">
-              <Route index element={<Heroes />} />
+              <Route index element={<Heroes/>} />
               <Route path=":id" element={<SingleHero />} />
             </Route>
             <Route path="episodes"  >
