@@ -124,3 +124,9 @@ button {
   display: flex;
   justify-content: center;
 }
+
+.navlink{
+  display: flex;
+  flex-direction: row-reverse;
+  font-size: 22px;
+}

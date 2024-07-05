@@ -1,11 +1,15 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { Header } from "./Header";
+import { AuthStatus } from "./AuthStatus";
 
 export function NavMenu() {
   return (
     <>
       <Header />
-
+      <AuthStatus />
+      {/* <div className="navlink">
+        <NavLink to="login">Login</NavLink>
+      </div> */}
       <div className="Navmenu__container">
         <nav>
           <NavLink to="/categories">Categories</NavLink>
@@ -22,7 +26,7 @@ export function NavMenu() {
           </ul>
         </nav>
       </div>
-        <Outlet />
+      <Outlet />
     </>
   );
 }
