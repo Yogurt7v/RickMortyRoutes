@@ -1,11 +1,28 @@
 import { NavLink, useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { sort } from "../utils/sort";
-import ErrorBoundary from "./ErrorBoundary";
+// import ErrorBoundary from "./ErrorBoundary";
 
-export function Heroes({ heroes }) {
+export function Heroes() {
   const [sortParams, setSortParams] = useSearchParams();
   const [newArray, setNewArray] = useState([]);
+  const [heroes, setHeroes] = useState([]);
+  const page = useRef(1);
+
+  useEffect(() => {
+    const fetchHeroes = async () => {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/character?page=${page.current}`
+      );
+      const data = await response.json();
+      return data;
+    };
+
+    fetchHeroes().then((heroesData) => {
+      // setHeroes(heroesData.results);
+      setNewArray([...heroes, ...heroesData.results]);
+    });
+  }, [heroes, newArray]);
 
   function handleSort(key) {
     setSortParams({ key: key });
@@ -17,8 +34,6 @@ export function Heroes({ heroes }) {
     const sortedHeroes = sort(heroes, sortParams.get("key"));
     setNewArray(sortedHeroes);
   }, [sortParams, heroes]);
-
-  console.log(newArray[0]);
 
   return (
     <>
@@ -33,14 +48,13 @@ export function Heroes({ heroes }) {
       {newArray?.map((item) => (
         <div key={item.id} className="card__wrapper">
           <div className="items">
-            <ErrorBoundary>
-              <NavLink to={`/categories/heroes/${item.id}`}>
-                <h2>{item.name}</h2>
-              </NavLink>
-            </ErrorBoundary>
+            <NavLink to={`/categories/heroes/${item.id}`}>
+              <h2>{item.name}</h2>
+            </NavLink>
           </div>
         </div>
       ))}
+      <button onClick={() => (page.current += 1)}>Показать еще</button>
     </>
   );
 }

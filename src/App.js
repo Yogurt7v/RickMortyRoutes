@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { NavMenu } from "./components/Navmenu";
 import { AuthProvider } from "./context/AuthProvider";
 import "./App.css";
-import { lazy, Suspense, useState, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const Home = lazy(() =>
@@ -56,26 +56,6 @@ const SingleLocation = lazy(() =>
 );
 
 function App() {
-  const [heroes, setHeroes] = useState([]);
-  const [locations, setLocations] = useState([]);
-  const [episodes, setEpisodes] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const [heroesRes, locationsRes, episodesRes] = await Promise.all([
-        fetch("https://rickandmortyapi.com/api/character"),
-        fetch("https://rickandmortyapi.com/api/location"),
-        fetch("https://rickandmortyapi.com/api/episode")
-      ]);
-      const heroes = await heroesRes.json();
-      const locations = await locationsRes.json();
-      const episodes = await episodesRes.json();
-      setHeroes(heroes.results);
-      setLocations(locations.results);
-      setEpisodes(episodes.results);
-    };
-    fetchData();
-  }, []);
 
   return (
     <BrowserRouter>
@@ -86,7 +66,7 @@ function App() {
             <Route path="/categories">
               <Route index element={<Categories />} />
               <Route path="heroes">
-                <Route index element={<ErrorBoundary><Heroes heroes={heroes}/></ErrorBoundary>} />
+                <Route index element={<Heroes/>} />
                 <Route
                   path=":id"
                   element={
@@ -100,7 +80,7 @@ function App() {
               </Route>
               
               <Route path="episodes">
-                <Route index element={<Episodes episodes={episodes} />} />
+                <Route index element={<Episodes />} />
                 <Route
                   path=":id"
                   element={
@@ -113,7 +93,7 @@ function App() {
                 />
               </Route>
               <Route path="locations">
-                <Route index element={<Locations locations={locations} />} />
+                <Route index element={<Locations />} />
                 <Route
                   path=":id"
                   element={

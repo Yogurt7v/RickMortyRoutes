@@ -3,23 +3,23 @@ import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { sort } from "../utils/sort";
 
-export function Locations({ locations }) {
+export function Locations() {
   const [sortParams, setSortParams] = useSearchParams();
   const [newArray, setNewArray] = useState([]);
-  // const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchLocations = async () => {
-  //     const response = await fetch("https://rickandmortyapi.com/api/location");
-  //     const data = await response.json();
-  //     return data;
-  //   };
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const response = await fetch("https://rickandmortyapi.com/api/location");
+      const data = await response.json();
+      return data;
+    };
 
-  //   fetchLocations().then((locationsData) => {
-  //     setLocations(locationsData.results);
-  //     setNewArray(locationsData.results);
-  //   });
-  // }, []);
+    fetchLocations().then((locationsData) => {
+      setLocations(locationsData.results);
+      setNewArray(locationsData.results);
+    });
+  }, []);
 
   function handleSort(key) {
     setSortParams({ key: key });
