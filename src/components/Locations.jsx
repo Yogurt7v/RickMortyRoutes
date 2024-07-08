@@ -1,30 +1,47 @@
-import location from "../data-base/location.json";
 import { NavLink } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { sort } from "../utils/sort";
 
-export function Locations() {
+export function Locations({ locations }) {
   const [sortParams, setSortParams] = useSearchParams();
   const [newArray, setNewArray] = useState([]);
+  // const [locations, setLocations] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchLocations = async () => {
+  //     const response = await fetch("https://rickandmortyapi.com/api/location");
+  //     const data = await response.json();
+  //     return data;
+  //   };
+
+  //   fetchLocations().then((locationsData) => {
+  //     setLocations(locationsData.results);
+  //     setNewArray(locationsData.results);
+  //   });
+  // }, []);
 
   function handleSort(key) {
     setSortParams({ key: key });
-    const sortedHeroes = sort(location, key);
+    const sortedHeroes = sort(locations, key);
     setNewArray(sortedHeroes);
   }
 
   useEffect(() => {
-    const sortedHeroes = sort(location, sortParams.get("key"));
-    setNewArray(sortedHeroes);
-  }, [sortParams]);
+    const sortedLocations = sort(locations, sortParams.get("key"));
+    setNewArray(sortedLocations);
+  }, [sortParams, locations]);
 
   return (
     <>
-      <div className="button__wrapper">
-        <button onClick={() => handleSort("ASC")}>по возрастанию</button>
-        <button onClick={() => handleSort("DESC")}>по убыванию</button>
-      </div>
+      {locations ? (
+        <div className="button__wrapper">
+          <button onClick={() => handleSort("ASC")}>по возрастанию</button>
+          <button onClick={() => handleSort("DESC")}>по убыванию</button>
+        </div>
+      ) : (
+        <p>Ничего не найдено</p>
+      )}
       {newArray.map((item) => (
         <div key={item.id} className="card__wrapper">
           <div className="items">
