@@ -1,35 +1,50 @@
 import { NavLink } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { sort } from "../utils/sort";
+import { fetchData } from "../utils/fetchData";
 
-export function Episodes()  {
+export function Episodes() {
   const [sortParams, setSortParams] = useSearchParams();
-  const [newArray, setNewArray] = useState([]);
   const [episodes, setEpisodes] = useState([]);
+  const [page, setPage] = useState(1);
+  const observer = useRef();
+
+  const lastNode = useCallback((node) => {
+    if (observer.current) {
+      observer.current.disconnect();
+    }
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPage((prev) => prev + 1);
+      }
+    });
+    if (node) {
+      observer.current.observe(node);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchEpisodes = async () => {
-      const response = await fetch("https://rickandmortyapi.com/api/episode");
-      const data = await response.json();
-      return data;
+      const response = await fetchData(
+        `https://rickandmortyapi.com/api/episode?page=${page}`,
+        page
+      );
+      setEpisodes([...episodes, ...response]);
     };
-
-    fetchEpisodes().then((episodesData) => {
-      setEpisodes(episodesData.results);
-      setNewArray(episodesData.results);
-    });
-  }, []);
+    fetchEpisodes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   function handleSort(key) {
     setSortParams({ key: key });
-    const sortedHeroes = sort(episodes, key);
-    setNewArray(sortedHeroes);
+    const sortedEpisodes = sort(episodes, key);
+    setEpisodes(sortedEpisodes);
   }
 
   useEffect(() => {
     const sortedHeroes = sort(episodes, sortParams.get("key"));
-    setNewArray(sortedHeroes);
+    setEpisodes(sortedHeroes);
   }, [sortParams, episodes]);
 
   return (
@@ -42,11 +57,17 @@ export function Episodes()  {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {newArray.map((item) => (
+      {episodes.map((item, index) => (
         <div key={item?.id} className="card__wrapper">
           <div className="items">
             <NavLink to={`/categories/episodes/${item.id}`}>
-              <h2>{item?.name}</h2>
+              <h2
+                ref={(el) => {
+                  if (index === episodes.length - 1) lastNode(el);
+                }}
+              >
+                {item?.name}
+              </h2>
             </NavLink>
           </div>
         </div>

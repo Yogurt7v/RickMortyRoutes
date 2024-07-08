@@ -1,22 +1,37 @@
 import { NavLink, useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { sort } from "../utils/sort";
+import { fetchData } from "../utils/fetchData";
 
 export function Heroes() {
   const [sortParams, setSortParams] = useSearchParams();
   const [heroes, setHeroes] = useState([]);
   const [page, setPage] = useState(1);
+  const observer = useRef();
+
+  const lastNode = useCallback((node) => {
+    if (observer.current) {observer.current.disconnect()}
+    observer.current = new IntersectionObserver(entries => {
+      if(entries[0].isIntersecting){
+        setPage ( (prev => prev + 1) );
+      }
+      })
+      if (node){
+        observer.current.observe(node);
+      }
+    }, []);
+
 
   useEffect(() => {
     const fetchHeroes = async () => {
-      const response = await fetch(`https://rickandmortyapi.com/api/character?page=${page}`);
-      const data = await response.json();
-      return data;
+      const response = await fetchData(
+        `https://rickandmortyapi.com/api/character?page=${page}`,
+        page
+      );
+      setHeroes([...heroes, ...response]);
     };
-
-    fetchHeroes().then((heroesData) => {
-      setHeroes([...heroes, ...heroesData.results]);
-    });
+    fetchHeroes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   function handleSort(key) {
@@ -24,7 +39,7 @@ export function Heroes() {
     const sortedHeroes = sort(heroes, key);
     setHeroes(sortedHeroes);
   }
-  
+
   useEffect(() => {
     const sortedHeroes = sort(heroes, sortParams.get("key"));
     setHeroes(sortedHeroes);
@@ -40,16 +55,17 @@ export function Heroes() {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {heroes?.map((item) => (
+      {heroes?.map((item, index) => (
         <div key={item.id} className="card__wrapper">
-          <div className="items">
+          <div className="items" >
             <NavLink to={`/categories/heroes/${item.id}`}>
-              <h2>{item.name}</h2>
+              <h2 ref={(el) =>{
+                if (index === heroes.length - 1) lastNode(el);
+              }}>{item.name}</h2>
             </NavLink>
           </div>
         </div>
       ))}
-      <button onClick={()=> setPage((prev) => prev + 1)}>Показать еще</button>
     </>
   );
 }

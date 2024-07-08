@@ -1,35 +1,49 @@
 import { NavLink } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { sort } from "../utils/sort";
+import { fetchData } from "../utils/fetchData";
 
 export function Locations() {
   const [sortParams, setSortParams] = useSearchParams();
-  const [newArray, setNewArray] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [page, setPage] = useState(1);
+  const observer = useRef();
 
-  useEffect(() => {
-    const fetchLocations = async () => {
-      const response = await fetch("https://rickandmortyapi.com/api/location");
-      const data = await response.json();
-      return data;
-    };
 
-    fetchLocations().then((locationsData) => {
-      setLocations(locationsData.results);
-      setNewArray(locationsData.results);
-    });
-  }, []);
+  const lastNode = useCallback((node) => {
+    if (observer.current) {observer.current.disconnect()}
+    observer.current = new IntersectionObserver(entries => {
+      if(entries[0].isIntersecting){
+        setPage ( (prev => prev + 1) );
+      }
+      })
+      if (node){
+        observer.current.observe(node);
+      }
+    }, []);
+
+    useEffect(() => {
+      const fetchLocations = async () => {
+        const response = await fetchData(
+          `https://rickandmortyapi.com/api/location?page=${page}`,
+          page
+        );
+        setLocations([...locations, ...response]);
+      };
+      fetchLocations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page]);
 
   function handleSort(key) {
     setSortParams({ key: key });
-    const sortedHeroes = sort(locations, key);
-    setNewArray(sortedHeroes);
+    const sortedLocations = sort(locations, key);
+    setLocations(sortedLocations);
   }
 
   useEffect(() => {
     const sortedLocations = sort(locations, sortParams.get("key"));
-    setNewArray(sortedLocations);
+    setLocations(sortedLocations);
   }, [sortParams, locations]);
 
   return (
@@ -42,11 +56,13 @@ export function Locations() {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {newArray.map((item) => (
+      {locations.map((item, index) => (
         <div key={item.id} className="card__wrapper">
           <div className="items">
             <NavLink to={`/categories/locations/${item.id}`}>
-              <h2>{item.name}</h2>
+              <h2 ref={(el) =>{
+                if (index === locations.length - 1) lastNode(el);
+              }}>{item.name}</h2>
             </NavLink>
           </div>
         </div>

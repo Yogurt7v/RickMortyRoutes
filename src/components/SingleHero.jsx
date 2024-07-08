@@ -28,10 +28,9 @@ export function SingleHero() {
       <img src={person.image} alt={person.name} />
       {person.type && <p>Type: {person.type}</p>}
       <p>Created: {person.created}</p>
-
-      {/* <div className="button__wrapper">
+      <div className="button__wrapper">
         <button onClick={() => navigate("/categories/heroes")}>Back</button>
-      </div> */}
+      </div>
     </div>
   );
 }
