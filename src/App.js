@@ -66,7 +66,7 @@ function App() {
             <Route path="/categories">
               <Route index element={<Categories />} />
               <Route path="heroes">
-                <Route index element={<Heroes/>} />
+                <Route index element={<ErrorBoundary><Heroes/></ErrorBoundary>} />
                 <Route
                   path=":id"
                   element={
@@ -80,7 +80,7 @@ function App() {
               </Route>
               
               <Route path="episodes">
-                <Route index element={<Episodes />} />
+                <Route index element={<ErrorBoundary><Episodes /></ErrorBoundary>} />
                 <Route
                   path=":id"
                   element={
@@ -93,7 +93,7 @@ function App() {
                 />
               </Route>
               <Route path="locations">
-                <Route index element={<Locations />} />
+                <Route index element={<ErrorBoundary><Locations /></ErrorBoundary>} />
                 <Route
                   path=":id"
                   element={

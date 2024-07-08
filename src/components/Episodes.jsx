@@ -2,12 +2,12 @@ import { NavLink } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { sort } from "../utils/sort";
-import { fetchData } from "../utils/fetchData";
 
 export function Episodes() {
   const [sortParams, setSortParams] = useSearchParams();
   const [episodes, setEpisodes] = useState([]);
   const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState();
   const observer = useRef();
 
   const lastNode = useCallback((node) => {
@@ -15,25 +15,34 @@ export function Episodes() {
       observer.current.disconnect();
     }
     observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && (page < lastPage)) {
         setPage((prev) => prev + 1);
       }
     });
     if (node) {
       observer.current.observe(node);
     }
+  }, [lastPage, page]);
+
+  useEffect(() => {
+    const fetchEpisodesCount = async () => {
+      const response = await fetch("https://rickandmortyapi.com/api/episode");
+      const data = await response.json();
+      setLastPage(data.info.pages);
+    };
+    fetchEpisodesCount();
   }, []);
 
   useEffect(() => {
-    const fetchEpisodes = async () => {
-      const response = await fetchData(
-        `https://rickandmortyapi.com/api/episode?page=${page}`,
-        page
+    const fetchEpisode = async () => {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/episode?page=${page}`
       );
-      setEpisodes([...episodes, ...response]);
+      const data = await response.json();
+      const res = data.results;
+      setEpisodes((prev) => [...prev, ...res]);
     };
-    fetchEpisodes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchEpisode();
   }, [page]);
 
   function handleSort(key) {
@@ -61,12 +70,12 @@ export function Episodes() {
         <div key={item?.id} className="card__wrapper">
           <div className="items">
             <NavLink to={`/categories/episodes/${item.id}`}>
-              <h2
-                ref={(el) => {
-                  if (index === episodes.length - 1) lastNode(el);
-                }}
-              >
-                {item?.name}
+              <h2>
+                {episodes.length === index + 1 ? (
+                  <div ref={lastNode}>{item?.name}</div>
+                ) : (
+                  <>{item?.name}</>
+                )}
               </h2>
             </NavLink>
           </div>
