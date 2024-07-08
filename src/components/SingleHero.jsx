@@ -1,26 +1,37 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import heroes from "../data-base/characters.json";
 
 export function SingleHero() {
   const params = useParams();
   const navigate = useNavigate();
+  const [person, setPerson] = useState([]);
 
-  // eslint-disable-next-line eqeqeq
-  const person = heroes.filter((hero) => hero.id == params.id);
+  useEffect(() => {
+    const SingleHero = async () => {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/character/${params.id}`
+      );
+      const data = await response.json();
+      return data;
+    };
+    SingleHero().then((personData) => {
+      setPerson(personData);
+    });
+  }, [params.id]);
 
   return (
     <div className="card__wrapper">
-      <h1>{person[0].name}</h1>
-      <p>Status: {person[0].status}</p>
-      <p>Species: {person[0].species}</p>
-      <p>Gender: {person[0].gender}</p>
-      <img src={person[0].image} alt={person[0].name} />
-      {person[0].type && <p>Type: {person[0].type}</p>}
-      <p>Created: {person[0].created}</p>
+      <h1>{person.name}</h1>
+      <p>Status: {person.status}</p>
+      <p>Species: {person.species}</p>
+      <p>Gender: {person.gender}</p>
+      <img src={person.image} alt={person.name} />
+      {person.type && <p>Type: {person.type}</p>}
+      <p>Created: {person.created}</p>
 
-      <div className="button__wrapper">
+      {/* <div className="button__wrapper">
         <button onClick={() => navigate("/categories/heroes")}>Back</button>
-      </div>
+      </div> */}
     </div>
   );
 }

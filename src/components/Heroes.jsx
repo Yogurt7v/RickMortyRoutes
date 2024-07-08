@@ -1,38 +1,33 @@
 import { NavLink, useSearchParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { sort } from "../utils/sort";
-// import ErrorBoundary from "./ErrorBoundary";
 
 export function Heroes() {
   const [sortParams, setSortParams] = useSearchParams();
-  const [newArray, setNewArray] = useState([]);
   const [heroes, setHeroes] = useState([]);
-  const page = useRef(1);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const fetchHeroes = async () => {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/character?page=${page.current}`
-      );
+      const response = await fetch(`https://rickandmortyapi.com/api/character?page=${page}`);
       const data = await response.json();
       return data;
     };
 
     fetchHeroes().then((heroesData) => {
-      // setHeroes(heroesData.results);
-      setNewArray([...heroes, ...heroesData.results]);
+      setHeroes([...heroes, ...heroesData.results]);
     });
-  }, [heroes, newArray]);
+  }, [page]);
 
   function handleSort(key) {
     setSortParams({ key: key });
     const sortedHeroes = sort(heroes, key);
-    setNewArray(sortedHeroes);
+    setHeroes(sortedHeroes);
   }
-
+  
   useEffect(() => {
     const sortedHeroes = sort(heroes, sortParams.get("key"));
-    setNewArray(sortedHeroes);
+    setHeroes(sortedHeroes);
   }, [sortParams, heroes]);
 
   return (
@@ -45,7 +40,7 @@ export function Heroes() {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {newArray?.map((item) => (
+      {heroes?.map((item) => (
         <div key={item.id} className="card__wrapper">
           <div className="items">
             <NavLink to={`/categories/heroes/${item.id}`}>
@@ -54,7 +49,7 @@ export function Heroes() {
           </div>
         </div>
       ))}
-      <button onClick={() => (page.current += 1)}>Показать еще</button>
+      <button onClick={()=> setPage((prev) => prev + 1)}>Показать еще</button>
     </>
   );
 }
