@@ -10,19 +10,22 @@ export function Episodes() {
   const [lastPage, setLastPage] = useState();
   const observer = useRef();
 
-  const lastNode = useCallback((node) => {
-    if (observer.current) {
-      observer.current.disconnect();
-    }
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && (page < lastPage)) {
-        setPage((prev) => prev + 1);
+  const lastNode = useCallback(
+    (node) => {
+      if (observer.current) {
+        observer.current.disconnect();
       }
-    });
-    if (node) {
-      observer.current.observe(node);
-    }
-  }, [lastPage, page]);
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && page < lastPage) {
+          setPage((prev) => prev + 1);
+        }
+      });
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [lastPage, page]
+  );
 
   useEffect(() => {
     const fetchEpisodesCount = async () => {
@@ -39,8 +42,9 @@ export function Episodes() {
         `https://rickandmortyapi.com/api/episode?page=${page}`
       );
       const data = await response.json();
-      const res = data.results;
-      setEpisodes((prev) => [...prev, ...res]);
+      setEpisodes((prev) => {
+        return [...new Set([...prev, ...data.results])];
+      });
     };
     fetchEpisode();
   }, [page]);
@@ -66,21 +70,29 @@ export function Episodes() {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {episodes.map((item, index) => (
-        <div key={item?.id} className="card__wrapper">
-          <div className="items">
-            <NavLink to={`/categories/episodes/${item.id}`}>
-              <h2>
-                {episodes.length === index + 1 ? (
-                  <div ref={lastNode}>{item?.name}</div>
-                ) : (
-                  <>{item?.name}</>
-                )}
-              </h2>
-            </NavLink>
-          </div>
-        </div>
-      ))}
+      {episodes.map((item, index) => {
+        if (episodes.length === index + 1) {
+          return (
+            <div key={item.id} className="card__wrapper">
+              <div className="items">
+                <NavLink to={`/categories/episodes/${item.id}`}>
+                  <h2 ref={lastNode}>{item?.name}</h2>
+                </NavLink>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div key={item.id} className="card__wrapper">
+              <div className="items">
+                <NavLink to={`/categories/episodes/${item.id}`}>
+                  <h2>{item?.name}</h2>
+                </NavLink>
+              </div>
+            </div>
+          );
+        }
+      })}
     </>
   );
 }

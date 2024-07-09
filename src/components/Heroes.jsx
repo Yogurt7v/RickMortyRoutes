@@ -9,38 +9,44 @@ export function Heroes() {
   const [lastPage, setLastPage] = useState();
   const observer = useRef();
 
-  const lastNode = useCallback((node) => {
-    if (observer.current) {observer.current.disconnect()}
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && (page < lastPage)) {
-        setPage ( (prev => prev + 1) );
+  const lastNode = useCallback(
+    (node) => {
+      if (observer.current) {
+        observer.current.disconnect();
       }
-      })
-      if (node){
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && page < lastPage) {
+          setPage(page + 1);
+        }
+      });
+      if (node) {
         observer.current.observe(node);
       }
-    }, [page, lastPage]);
+    },
+    [page, lastPage]
+  );
 
-    useEffect(() => {
-      const fetchEpisodesCount = async () => {
-        const response = await fetch("https://rickandmortyapi.com/api/character");
-        const data = await response.json();
-        setLastPage(data.info.pages);
-      };
-      fetchEpisodesCount();
-    }, []);
+  useEffect(() => {
+    const fetchEpisodesCount = async () => {
+      const response = await fetch("https://rickandmortyapi.com/api/character");
+      const data = await response.json();
+      setLastPage(data.info.pages);
+    };
+    fetchEpisodesCount();
+  }, []);
 
-
-    useEffect(() => {
-      const fetchHeroes = async () => {
-        const response = await fetch(
-          `https://rickandmortyapi.com/api/character?page=${page}`
-        );
-        const data = await response.json();
-        setHeroes([...heroes, ...data.results])
-      };
-      fetchHeroes();
-    }, [page]);
+  useEffect(() => {
+    const fetchHeroes = async (page) => {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/character?page=${page}`
+      );
+      const data = await response.json();
+      setHeroes((prev) => {
+        return [...new Set([...prev, ...data.results])];
+      });
+    };
+    fetchHeroes(page);
+  }, [page]);
 
   function handleSort(key) {
     setSortParams({ key: key });
@@ -63,21 +69,31 @@ export function Heroes() {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {heroes?.map((item, index) => (
-        <div key={item.id} className="card__wrapper">
-          <div className="items" >
-            <NavLink to={`/categories/heroes/${item.id}`}>
-            <h2>
-                {heroes.length === index + 1 ? (
-                  <div ref={lastNode}>{item?.name}</div>
-                ) : (
-                  <>{item?.name}</>
-                )}
-              </h2>
-            </NavLink>
-          </div>
-        </div>
-      ))}
+      {heroes?.map((item, index) => {
+        if (heroes.length === index + 1) {
+          return (
+            <div key={item.id} className="card__wrapper" >
+              <div className="items">
+                <NavLink to={`/categories/heroes/${item.id}`}>
+                  <h2 ref={lastNode}>{item?.name}
+                  </h2>
+                </NavLink>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div key={item.id} className="card__wrapper">
+              <div className="items">
+                <NavLink to={`/categories/heroes/${item.id}`}>
+                  <h2>{item?.name}</h2>
+                </NavLink>
+              </div>
+            </div>
+          );
+        }
+      })}
     </>
   );
 }
+

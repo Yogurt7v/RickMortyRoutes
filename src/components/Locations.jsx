@@ -10,21 +10,22 @@ export function Locations() {
   const [lastPage, setLastPage] = useState();
   const observer = useRef();
 
-  const lastNode = useCallback((node) => {
-    if (observer.current) {
-      observer.current.disconnect();
-    }
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && (page < lastPage)) {
-        setPage((prev) => prev + 1);
+  const lastNode = useCallback(
+    (node) => {
+      if (observer.current) {
+        observer.current.disconnect();
       }
-    });
-    if (node) {
-      observer.current.observe(node);
-    }
-  }, [page, lastPage]);
-
-
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && page < lastPage) {
+          setPage((prev) => prev + 1);
+        }
+      });
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [page, lastPage]
+  );
 
   useEffect(() => {
     const fetchLocations = async (page) => {
@@ -32,11 +33,12 @@ export function Locations() {
         `https://rickandmortyapi.com/api/location?page=${page}`
       );
       const data = await response.json();
-      setLocations((prev) => [...prev, ...data.results])
+      setLocations((prev) => {
+        return [...new Set([...prev, ...data.results])];
+      });
     };
     fetchLocations();
   }, [page]);
-
 
   useEffect(() => {
     const fetchEpisodesCount = async () => {
@@ -53,7 +55,6 @@ export function Locations() {
     setLocations(sortedLocations);
   }
 
-  
   useEffect(() => {
     const sortedLocations = sort(locations, sortParams.get("key"));
     setLocations(sortedLocations);
@@ -69,21 +70,29 @@ export function Locations() {
       ) : (
         <p>Ничего не найдено</p>
       )}
-      {locations.map((item, index) => (
-        <div key={item.id} className="card__wrapper">
-          <div className="items">
-            <NavLink to={`/categories/locations/${item.id}`}>
-            <h2>
-                {locations.length === index + 1 ? (
-                  <div ref={lastNode}>{item?.name}</div>
-                ) : (
-                  <>{item?.name}</>
-                )}
-              </h2>
-            </NavLink>
-          </div>
-        </div>
-      ))}
+      {locations.map((item, index) => {
+        if (locations.length === index + 1) {
+          return (
+            <div key={item.id} className="card__wrapper">
+              <div className="items">
+                <NavLink to={`/categories/locations/${item.id}`}>
+                  <h2 ref={lastNode}>{item?.name}</h2>
+                </NavLink>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div key={item.id} className="card__wrapper">
+              <div className="items">
+                <NavLink to={`/categories/locations/${item.id}`}>
+                  <h2>{item?.name}</h2>
+                </NavLink>
+              </div>
+            </div>
+          );
+        }
+      })}
     </>
   );
 }
