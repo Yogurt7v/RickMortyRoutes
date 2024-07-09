@@ -75,7 +75,7 @@ export function Locations() {
           return (
             <div key={item.id} className="card__wrapper">
               <div className="items">
-                <NavLink to={`/categories/locations/${item.id}`}>
+                <NavLink state={locations} to={`/categories/locations/${item.id}`}>
                   <h2 ref={lastNode}>{item?.name}</h2>
                 </NavLink>
               </div>
@@ -85,7 +85,7 @@ export function Locations() {
           return (
             <div key={item.id} className="card__wrapper">
               <div className="items">
-                <NavLink to={`/categories/locations/${item.id}`}>
+                <NavLink state={locations} to={`/categories/locations/${item.id}`}>
                   <h2>{item?.name}</h2>
                 </NavLink>
               </div>

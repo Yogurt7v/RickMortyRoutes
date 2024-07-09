@@ -75,7 +75,7 @@ export function Episodes() {
           return (
             <div key={item.id} className="card__wrapper">
               <div className="items">
-                <NavLink to={`/categories/episodes/${item.id}`}>
+                <NavLink state={episodes} to={`/categories/episodes/${item.id}`}>
                   <h2 ref={lastNode}>{item?.name}</h2>
                 </NavLink>
               </div>
@@ -85,7 +85,7 @@ export function Episodes() {
           return (
             <div key={item.id} className="card__wrapper">
               <div className="items">
-                <NavLink to={`/categories/episodes/${item.id}`}>
+                <NavLink state={episodes} to={`/categories/episodes/${item.id}`}>
                   <h2>{item?.name}</h2>
                 </NavLink>
               </div>

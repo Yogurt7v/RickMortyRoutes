@@ -1,23 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export function SingleHero() {
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [person, setPerson] = useState([]);
+  
 
   useEffect(() => {
-    const SingleHero = async () => {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/character/${params.id}`
-      );
-      const data = await response.json();
-      return data;
-    };
-    SingleHero().then((personData) => {
-      setPerson(personData);
-    });
-  }, [params.id]);
+    setPerson(location.state.filter((item)=> item.id == params.id)[0])
+  }, [params.id, location.state]);
 
   return (
     <div className="card__wrapper">

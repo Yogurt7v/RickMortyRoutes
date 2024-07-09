@@ -1,23 +1,15 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 export function SingleLocation() {
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [local, setLocal] = useState([]);
 
   useEffect(() => {
-    const SingleLocal = async () => {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/location/${params.id}`
-      );
-      const data = await response.json();
-      return data;
-    };
-    SingleLocal().then((personData) => {
-      setLocal(personData);
-    });
-  }, [params.id]);
+    setLocal(location.state.filter((item)=> item.id == params.id)[0])
+  }, [params.id, location.state]);
 
 
   return (

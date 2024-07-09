@@ -1,25 +1,15 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 export function SingleEpisode() {
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [episode, setEpisode] = useState([]);
 
-
   useEffect(() => {
-    const SingleEpisode = async () => {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/episode/${params.id}`
-      );
-      const data = await response.json();
-      return data;
-    };
-    SingleEpisode().then((episodeData) => {
-      setEpisode(episodeData);
-    });
-  }, [params.id]);
-
+    setEpisode(location.state.filter((item)=> item.id == params.id)[0])
+  }, [params.id, location.state]);
 
   return (
     <div className="card__wrapper">
