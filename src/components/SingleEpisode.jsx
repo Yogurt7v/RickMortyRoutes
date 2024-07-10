@@ -8,7 +8,17 @@ export function SingleEpisode() {
   const [episode, setEpisode] = useState([]);
 
   useEffect(() => {
-    setEpisode(location.state.filter((item)=> item.id == params.id)[0])
+    if (!location.state) {
+      fetch(`https://rickandmortyapi.com/api/episode/${params.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setEpisode(data);
+        });
+    } else {
+      setEpisode(
+        location.state.filter((item) => item.id === parseInt(params.id))[0]
+      );
+    }
   }, [params.id, location.state]);
 
   return (

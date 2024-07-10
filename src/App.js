@@ -1,9 +1,9 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { NavMenu } from "./components/Navmenu";
 import { AuthProvider } from "./context/AuthProvider";
-import "./App.css";
-import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
+import "./App.css";
 
 const Home = lazy(() =>
   import("./components/Home").then((module) => ({ default: module.Home }))

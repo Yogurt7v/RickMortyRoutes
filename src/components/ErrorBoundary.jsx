@@ -1,6 +1,6 @@
-import React from "react";
+import { Component } from "react";
 
-export class ErrorBoundary extends React.Component {
+export class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
@@ -11,16 +11,17 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.log("error", error.message);
-    console.log("errorInfo", errorInfo);
+    console.error("ErrorBoundary error:", error, errorInfo);
+    this.setState({ hasError: true });
   }
 
   render() {
     if (this.state.hasError) {
-      return <h1>Что то сломалось</h1>;
+      return <h1>Something went wrong</h1>;
     }
     return this.props.children;
   }
 }
 
 export default ErrorBoundary;
+

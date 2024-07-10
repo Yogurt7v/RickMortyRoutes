@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { sort } from "../utils/sort";
 
-export function useFetch(url, pageNumber, sortParams) {
+export function useFetch(url, pageNumber) {
   const [loading, setLoading] = useState(true);
   const [fetchResult, setFetchResult] = useState([]);
-
   const [hasMore, setHasMore] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -18,25 +17,22 @@ export function useFetch(url, pageNumber, sortParams) {
       .then((response) => {
         setFetchResult((prevstate) => {
           return [...new Set([...prevstate, ...response.data.results])];
-        });
-        if(sortParams) {
-          const sortedArray = sort(fetchResult, sortParams.get("key"));
-          setFetchResult(sortedArray);
-        }
+        })
+
         setLoading(false);
         setHasMore(response.data.results.length > 0);
       })
       .catch((error) => {
-        console.error("Fetch Error", error);
+        setError(error);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, pageNumber, sortParams]);
+  }, [url, pageNumber]);
 
 
   return {
     loading,
-    // error,
     fetchResult,
     hasMore,
+    error
   };
 }

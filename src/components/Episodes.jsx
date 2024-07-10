@@ -9,7 +9,7 @@ export function Episodes() {
   const [episodes, setEpisodes] = useState([]);
   const [page, setPage] = useState(1);
 
-  const { loading, fetchResult, hasMore } = useFetch(
+  const { loading, fetchResult, hasMore, error } = useFetch(
     "https://rickandmortyapi.com/api/episode",
     page
   );
@@ -41,6 +41,14 @@ export function Episodes() {
     setSortParams({ key: key });
     const sortedEpisodes = sort(episodes, key);
     setEpisodes(sortedEpisodes);
+  }
+
+  if (error){
+    return (
+      <div className="card__wrapper">
+        <h2>{error.message}</h2>
+      </div>
+    )
   }
 
   return (

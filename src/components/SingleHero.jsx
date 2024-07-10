@@ -6,10 +6,17 @@ export function SingleHero() {
   const navigate = useNavigate();
   const location = useLocation();
   const [person, setPerson] = useState([]);
-  
 
   useEffect(() => {
-    setPerson(location.state.filter((item)=> item.id == params.id)[0])
+    if (!location.state) {
+      fetch(`https://rickandmortyapi.com/api/character/${params.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+         setPerson(data);
+        });
+    } else {
+      setPerson(location.state.filter((item) => item.id === parseInt(params.id))[0]);
+    }
   }, [params.id, location.state]);
 
   return (

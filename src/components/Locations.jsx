@@ -9,7 +9,7 @@ export function Locations() {
   const [locations, setLocations] = useState([]);
   const [page, setPage] = useState(1);
 
-  const { loading, fetchResult, hasMore } = useFetch(
+  const { loading, fetchResult, hasMore, error } = useFetch(
     "https://rickandmortyapi.com/api/location",
     page
   );
@@ -41,6 +41,14 @@ export function Locations() {
     setSortParams({ key: key });
     const sortedLocations = sort(locations, key);
     setLocations(sortedLocations);
+  }
+
+  if (error){
+    return (
+      <div className="card__wrapper">
+        <h2>{error.message}</h2>
+      </div>
+    )
   }
 
   return (

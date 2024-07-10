@@ -8,7 +8,7 @@ export function Heroes() {
   const [heroes, setHeroes] = useState([]);
   const [page, setPage] = useState(1);
 
-  const { loading, fetchResult, hasMore } = useFetch(
+  const { loading, fetchResult, hasMore, error } = useFetch(
     "https://rickandmortyapi.com/api/character",
     page
   );
@@ -42,13 +42,21 @@ export function Heroes() {
     setHeroes(sortedHeroes);
   }
 
+  if (error){
+    return (
+      <div className="card__wrapper">
+        <h2>{error.message}</h2>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="button__wrapper">
         <button onClick={() => handleSort("ASC")}>по возрастанию</button>
         <button onClick={() => handleSort("DESC")}>по убыванию</button>
       </div>
-      <div className="container">
+      <div className="container" hasError>
         {heroes?.map((item, index) => {
           if (heroes.length - 3 === index + 1) {
             return (
