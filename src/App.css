@@ -121,6 +121,9 @@ button {
 }
 
 .button__wrapper {
+  position: sticky;
+  top: 10px;
+
   display: flex;
   justify-content: center;
 }

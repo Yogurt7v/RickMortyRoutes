@@ -1,52 +1,40 @@
 import { NavLink, useSearchParams } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { sort } from "../utils/sort";
+import { useFetch } from "../utils/useFetch";
 
 export function Heroes() {
-  const [sortParams, setSortParams] = useSearchParams();
+  const [, setSortParams] = useSearchParams();
   const [heroes, setHeroes] = useState([]);
   const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState();
-  const observer = useRef();
 
+  const { loading, fetchResult, hasMore } = useFetch(
+    "https://rickandmortyapi.com/api/character",
+    page
+  );
+
+  const observer = useRef();
   const lastNode = useCallback(
     (node) => {
+      if (loading) return;
       if (observer.current) {
         observer.current.disconnect();
       }
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && page < lastPage) {
-          setPage(page + 1);
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prev) => prev + 1);
         }
       });
       if (node) {
         observer.current.observe(node);
       }
     },
-    [page, lastPage]
+    [loading, hasMore]
   );
 
   useEffect(() => {
-    const fetchEpisodesCount = async () => {
-      const response = await fetch("https://rickandmortyapi.com/api/character");
-      const data = await response.json();
-      setLastPage(data.info.pages);
-    };
-    fetchEpisodesCount();
-  }, []);
-
-  useEffect(() => {
-    const fetchHeroes = async (page) => {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/character?page=${page}`
-      );
-      const data = await response.json();
-      setHeroes((prev) => {
-        return [...new Set([...prev, ...data.results])];
-      });
-    };
-    fetchHeroes(page);
-  }, [page]);
+    setHeroes(fetchResult);
+  }, [fetchResult]);
 
   function handleSort(key) {
     setSortParams({ key: key });
@@ -54,46 +42,37 @@ export function Heroes() {
     setHeroes(sortedHeroes);
   }
 
-  useEffect(() => {
-    const sortedHeroes = sort(heroes, sortParams.get("key"));
-    setHeroes(sortedHeroes);
-  }, [sortParams, heroes]);
-
   return (
     <>
-      {heroes ? (
-        <div className="button__wrapper">
-          <button onClick={() => handleSort("ASC")}>по возрастанию</button>
-          <button onClick={() => handleSort("DESC")}>по убыванию</button>
-        </div>
-      ) : (
-        <p>Ничего не найдено</p>
-      )}
-      {heroes?.map((item, index) => {
-        if (heroes.length === index + 1) {
-          return (
-            <div key={item.id} className="card__wrapper" >
-              <div className="items">
-                <NavLink state={heroes} to={`/categories/heroes/${item.id}`}>
-                  <h2 ref={lastNode}>{item?.name}
-                  </h2>
-                </NavLink>
+      <div className="button__wrapper">
+        <button onClick={() => handleSort("ASC")}>по возрастанию</button>
+        <button onClick={() => handleSort("DESC")}>по убыванию</button>
+      </div>
+      <div className="container">
+        {heroes?.map((item, index) => {
+          if (heroes.length - 3 === index + 1) {
+            return (
+              <div key={item.id} className="card__wrapper">
+                <div className="items">
+                  <NavLink state={heroes} to={`/categories/heroes/${item.id}`}>
+                    <h2 ref={lastNode}>{item?.name}</h2>
+                  </NavLink>
+                </div>
               </div>
-            </div>
-          );
-        } else {
-          return (
-            <div key={item.id} className="card__wrapper">
-              <div className="items">
-                <NavLink state={heroes} to={`/categories/heroes/${item.id}`}>
-                  <h2>{item?.name}</h2>
-                </NavLink>
+            );
+          } else {
+            return (
+              <div key={item.id} className="card__wrapper">
+                <div className="items">
+                  <NavLink state={heroes} to={`/categories/heroes/${item.id}`}>
+                    <h2>{item?.name}</h2>
+                  </NavLink>
+                </div>
               </div>
-            </div>
-          );
-        }
-      })}
+            );
+          }
+        })}
+      </div>
     </>
   );
 }
-

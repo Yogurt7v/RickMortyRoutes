@@ -2,21 +2,27 @@ import { NavLink } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { sort } from "../utils/sort";
+import { useFetch } from "../utils/useFetch";
 
 export function Locations() {
-  const [sortParams, setSortParams] = useSearchParams();
+  const [, setSortParams] = useSearchParams();
   const [locations, setLocations] = useState([]);
   const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState();
-  const observer = useRef();
 
+  const { loading, fetchResult, hasMore } = useFetch(
+    "https://rickandmortyapi.com/api/location",
+    page
+  );
+
+  const observer = useRef();
   const lastNode = useCallback(
     (node) => {
+      if (loading) return;
       if (observer.current) {
         observer.current.disconnect();
       }
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && page < lastPage) {
+        if (entries[0].isIntersecting && hasMore) {
           setPage((prev) => prev + 1);
         }
       });
@@ -24,30 +30,12 @@ export function Locations() {
         observer.current.observe(node);
       }
     },
-    [page, lastPage]
+    [loading, hasMore]
   );
 
   useEffect(() => {
-    const fetchLocations = async (page) => {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/location?page=${page}`
-      );
-      const data = await response.json();
-      setLocations((prev) => {
-        return [...new Set([...prev, ...data.results])];
-      });
-    };
-    fetchLocations();
-  }, [page]);
-
-  useEffect(() => {
-    const fetchEpisodesCount = async () => {
-      const response = await fetch("https://rickandmortyapi.com/api/location");
-      const data = await response.json();
-      setLastPage(data.info.pages);
-    };
-    fetchEpisodesCount();
-  }, []);
+    setLocations(fetchResult);
+  }, [fetchResult]);
 
   function handleSort(key) {
     setSortParams({ key: key });
@@ -55,44 +43,43 @@ export function Locations() {
     setLocations(sortedLocations);
   }
 
-  useEffect(() => {
-    const sortedLocations = sort(locations, sortParams.get("key"));
-    setLocations(sortedLocations);
-  }, [sortParams, locations]);
-
   return (
     <>
-      {locations ? (
-        <div className="button__wrapper">
-          <button onClick={() => handleSort("ASC")}>по возрастанию</button>
-          <button onClick={() => handleSort("DESC")}>по убыванию</button>
-        </div>
-      ) : (
-        <p>Ничего не найдено</p>
-      )}
-      {locations.map((item, index) => {
-        if (locations.length === index + 1) {
-          return (
-            <div key={item.id} className="card__wrapper">
-              <div className="items">
-                <NavLink state={locations} to={`/categories/locations/${item.id}`}>
-                  <h2 ref={lastNode}>{item?.name}</h2>
-                </NavLink>
+      <div className="button__wrapper">
+        <button onClick={() => handleSort("ASC")}>по возрастанию</button>
+        <button onClick={() => handleSort("DESC")}>по убыванию</button>
+      </div>
+      <div className="container">
+        {locations.map((item, index) => {
+          if (locations.length === index + 1) {
+            return (
+              <div key={item.id} className="card__wrapper">
+                <div className="items">
+                  <NavLink
+                    state={locations}
+                    to={`/categories/locations/${item.id}`}
+                  >
+                    <h2 ref={lastNode}>{item?.name}</h2>
+                  </NavLink>
+                </div>
               </div>
-            </div>
-          );
-        } else {
-          return (
-            <div key={item.id} className="card__wrapper">
-              <div className="items">
-                <NavLink state={locations} to={`/categories/locations/${item.id}`}>
-                  <h2>{item?.name}</h2>
-                </NavLink>
+            );
+          } else {
+            return (
+              <div key={item.id} className="card__wrapper">
+                <div className="items">
+                  <NavLink
+                    state={locations}
+                    to={`/categories/locations/${item.id}`}
+                  >
+                    <h2>{item?.name}</h2>
+                  </NavLink>
+                </div>
               </div>
-            </div>
-          );
-        }
-      })}
+            );
+          }
+        })}
+      </div>
     </>
   );
 }

@@ -14,8 +14,11 @@ const Categories = lazy(() =>
   }))
 );
 const Heroes = lazy(() =>
-  import("./components/Heroes").then((module) => ({ default: module.Heroes }))
+  import("./components/Heroes").then((module) => ({
+    default: module.Heroes,
+  }))
 );
+
 const Episodes = lazy(() =>
   import("./components/Episodes").then((module) => ({
     default: module.Episodes,
@@ -56,7 +59,6 @@ const SingleLocation = lazy(() =>
 );
 
 function App() {
-
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -66,40 +68,61 @@ function App() {
             <Route path="/categories">
               <Route index element={<Categories />} />
               <Route path="heroes">
-                <Route index element={<ErrorBoundary><Heroes/></ErrorBoundary>} />
+                <Route
+                  index
+                  element={
+                    <ErrorBoundary>
+                      <Heroes />
+                    </ErrorBoundary>
+                  }
+                />
                 <Route
                   path=":id"
                   element={
                     <PrivateRoute>
                       <ErrorBoundary>
-                      <SingleHero />
+                        <SingleHero />
                       </ErrorBoundary>
                     </PrivateRoute>
                   }
                 />
               </Route>
-              
+
               <Route path="episodes">
-                <Route index element={<ErrorBoundary><Episodes /></ErrorBoundary>} />
+                <Route
+                  index
+                  element={
+                    <ErrorBoundary>
+                      <Episodes />
+                    </ErrorBoundary>
+                  }
+                />
                 <Route
                   path=":id"
                   element={
                     <PrivateRoute>
                       <ErrorBoundary>
-                      <SingleEpisode />
+                        <SingleEpisode />
                       </ErrorBoundary>
                     </PrivateRoute>
                   }
                 />
               </Route>
               <Route path="locations">
-                <Route index element={<ErrorBoundary><Locations /></ErrorBoundary>} />
+                <Route
+                  index
+                  element={
+                    <ErrorBoundary>
+                      <Locations />
+                    </ErrorBoundary>
+                  }
+                />
                 <Route
                   path=":id"
                   element={
                     <PrivateRoute>
                       <ErrorBoundary>
-                      <SingleLocation />
+                        <SingleLocation />
                       </ErrorBoundary>
                     </PrivateRoute>
                   }
