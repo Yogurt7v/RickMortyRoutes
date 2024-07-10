@@ -19,7 +19,7 @@ export function useSingleData(url) {
           location.state.filter((item) => item.id === parseInt(params.id))[0]
         );
       }
-    }, [params.id, location.state]);
+    }, [params.id, location.state, url]);
 
 
     return {
