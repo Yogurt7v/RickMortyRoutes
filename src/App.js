@@ -62,6 +62,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<NavMenu />}>
             <Route index element={<Home />} />
@@ -147,6 +148,7 @@ function App() {
             }
           />
         </Routes>
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   );

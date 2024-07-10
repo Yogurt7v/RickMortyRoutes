@@ -1,33 +1,20 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
+import { useSingleData } from "../utils/useSingleData";
 
 export function SingleHero() {
-  const params = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [person, setPerson] = useState([]);
 
-  useEffect(() => {
-    if (!location.state) {
-      fetch(`https://rickandmortyapi.com/api/character/${params.id}`)
-        .then((response) => response.json())
-        .then((data) => {
-         setPerson(data);
-        });
-    } else {
-      setPerson(location.state.filter((item) => item.id === parseInt(params.id))[0]);
-    }
-  }, [params.id, location.state]);
+  const {result} = useSingleData("https://rickandmortyapi.com/api/character");
 
   return (
     <div className="card__wrapper">
-      <h1>{person.name}</h1>
-      <p>Status: {person.status}</p>
-      <p>Species: {person.species}</p>
-      <p>Gender: {person.gender}</p>
-      <img src={person.image} alt={person.name} />
-      {person.type && <p>Type: {person.type}</p>}
-      <p>Created: {person.created}</p>
+      <h1>{result.name}</h1>
+      <p>Status: {result.status}</p>
+      <p>Species: {result.species}</p>
+      <p>Gender: {result.gender}</p>
+      <img src={result.image} alt={result.name} />
+      {result.type && <p>Type: {result.type}</p>}
+      <p>Created: {result.created}</p>
       <div className="button__wrapper">
         <button onClick={() => navigate("/categories/heroes")}>Back</button>
       </div>

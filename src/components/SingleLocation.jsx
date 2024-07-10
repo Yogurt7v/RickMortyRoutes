@@ -1,32 +1,17 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSingleData } from "../utils/useSingleData";
 
 export function SingleLocation() {
-  const params = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [local, setLocal] = useState([]);
 
-  useEffect(() => {
-    if (!location.state) {
-      fetch(`https://rickandmortyapi.com/api/location/${params.id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setLocal(data);
-        });
-    } else {
-      setLocal(
-        location.state.filter((item) => item.id === parseInt(params.id))[0]
-      );
-    }
-  }, [params.id, location.state]);
+  const { result } = useSingleData("https://rickandmortyapi.com/api/location");
 
   return (
     <div className="card__wrapper">
-      <h1>{local.name}</h1>
-      <p>Type: {local.type}</p>
-      <p>Dimension: {local.dimension}</p>
-      <p>Created: {local.created}</p>
+      <h1>{result.name}</h1>
+      <p>Type: {result.type}</p>
+      <p>Dimension: {result.dimension}</p>
+      <p>Created: {result.created}</p>
 
       <div className="button__wrapper">
         <button onClick={() => navigate("/categories/locations")}>Back</button>
