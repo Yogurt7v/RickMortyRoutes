@@ -56,7 +56,7 @@ export function Heroes() {
         <button onClick={() => handleSort("ASC")}>по возрастанию</button>
         <button onClick={() => handleSort("DESC")}>по убыванию</button>
       </div>
-      <div className="container" hasError>
+      <div>
         {heroes?.map((item, index) => {
           if (heroes.length - 3 === index + 1) {
             return (

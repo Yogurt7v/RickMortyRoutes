@@ -12,7 +12,7 @@ export function NavMenu() {
       <Header />
       <Suspense fallback={<div>Loading...</div>}>
         <AuthStatus />
-        <div className="Navmenu__container">
+        <div>
           <nav>
             <NavLink to="/categories">Categories</NavLink>
             <ul>

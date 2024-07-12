@@ -57,7 +57,7 @@ export function Episodes() {
         <button onClick={() => handleSort("ASC")}>по возрастанию</button>
         <button onClick={() => handleSort("DESC")}>по убыванию</button>
       </div>
-      <div className="container">
+      <div>
         {episodes.map((item, index) => {
           if (episodes.length === index + 1) {
             return (

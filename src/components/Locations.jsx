@@ -57,7 +57,7 @@ export function Locations() {
         <button onClick={() => handleSort("ASC")}>по возрастанию</button>
         <button onClick={() => handleSort("DESC")}>по убыванию</button>
       </div>
-      <div className="container">
+      <div>
         {locations.map((item, index) => {
           if (locations.length === index + 1) {
             return (
